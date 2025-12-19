@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp API Strategy | Automate Your Sales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary: #4CAF50;
+            --color-white: #FFFFFF;
+            --color-mint: #E8F5E9;
+            --color-dark-green: #2E7D32;
+            --color-light-grey: #F7F9F8;
+            --color-text: #1a1a1a;
+            --duration: 300ms;
+            --ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-white);
+            color: var(--color-text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--color-primary);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-header {
+            padding: 10px 20px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 250ms ease;
+        }
+
+        .btn-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.25);
+        }
+
+        .btn-header-wa {
+            padding: 10px 20px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 250ms ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-header-wa:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.25);
+        }
+
+        /* ===== FLOATING CTA (STICKY) ===== */
+        .sticky-cta {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            background: var(--color-primary);
+            color: var(--color-white);
+            padding: 14px 28px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+            animation: float 3s ease-in-out infinite, pulse-glow 2s ease-in-out infinite;
+            transition: all 300ms ease;
+        }
+
+        .sticky-cta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 10px 40px rgba(76, 175, 80, 0.5); }
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-white);
+            position: relative;
+            overflow: hidden;
+            padding-top: 60px;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            line-height: 1.3;
+            color: var(--color-text);
+            margin-bottom: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+
+        /* Floating shapes background */
+        .hero::before,
+        .hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+        }
+
+        .hero::before {
+            width: 400px;
+            height: 400px;
+            background: var(--color-primary);
+            top: -100px;
+            right: 10%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            width: 300px;
+            height: 300px;
+            background: var(--color-primary);
+            bottom: -50px;
+            left: 5%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        /* ===== PROBLEM CARDS SECTION ===== */
+        .problems-section {
+            padding: 80px 24px;
+            background: var(--color-light-grey);
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 60px;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+
+        .problems-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .problem-card {
+            background: var(--color-white);
+            padding: 32px 24px;
+            border-radius: 12px;
+            border: 2px solid var(--color-mint);
+            text-align: center;
+            opacity: 0;
+            animation: slideInUp 0.6s ease forwards;
+            cursor: pointer;
+            transition: all 300ms ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card:nth-child(1) { animation-delay: 0.1s; }
+        .problem-card:nth-child(2) { animation-delay: 0.2s; }
+        .problem-card:nth-child(3) { animation-delay: 0.3s; }
+        .problem-card:nth-child(4) { animation-delay: 0.4s; }
+        .problem-card:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .problem-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.15);
+            transform: translateY(-8px);
+        }
+
+        .problem-card h3 {
+            font-size: 1.3rem;
+            color: var(--color-dark-green);
+            margin-bottom: 12px;
+        }
+
+        .problem-card p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* ===== SOLUTION SECTION ===== */
+        .solution-section {
+            padding: 80px 24px;
+            background: var(--color-white);
+            text-align: center;
+        }
+
+        .solution-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .system-diagram {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .system-node {
+            background: var(--color-mint);
+            border: 3px solid var(--color-primary);
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--color-dark-green);
+            animation: pulse 2s ease-in-out infinite;
+            max-width: 180px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* ===== BENEFITS SECTION ===== */
+        .benefits-section {
+            padding: 80px 24px;
+            background: var(--color-light-grey);
+        }
+
+        .benefits-list {
+            max-width: 600px;
+            margin: 40px auto 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: var(--color-white);
+            border-radius: 10px;
+            opacity: 0;
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .benefit-item:nth-child(1) { animation-delay: 0.1s; }
+        .benefit-item:nth-child(2) { animation-delay: 0.2s; }
+        .benefit-item:nth-child(3) { animation-delay: 0.3s; }
+        .benefit-item:nth-child(4) { animation-delay: 0.4s; }
+
+        .benefit-check {
+            width: 24px;
+            height: 24px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-white);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .benefit-text {
+            font-size: 1rem;
+            color: var(--color-text);
+        }
+
+        /* ===== VIDEO SECTION ===== */
+        .video-section {
+            padding: 80px 24px;
+            background: var(--color-white);
+            text-align: center;
+        }
+
+        .video-frame {
+            max-width: 700px;
+            margin: 40px auto 0;
+            position: relative;
+            aspect-ratio: 16 / 9;
+            background: var(--color-mint);
+            border: 4px solid var(--color-primary);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: slideInUp 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 300ms ease;
+            animation: pulse-play 2s ease-in-out infinite;
+        }
+
+        .play-button::after {
+            content: '▶';
+            color: var(--color-white);
+            font-size: 32px;
+            margin-left: 4px;
+        }
+
+        .play-button:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        @keyframes pulse-play {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.5); }
+            50% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
+        }
+
+        /* ===== QUALIFICATION SECTION ===== */
+        .qualification-section {
+            padding: 80px 24px;
+            background: var(--color-light-grey);
+        }
+
+        .qualification-content {
+            max-width: 700px;
+            margin: 40px auto 0;
+        }
+
+        .checkbox-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--color-white);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 200ms ease;
+            border: 2px solid transparent;
+        }
+
+        .checkbox-card:hover {
+            border-color: var(--color-primary);
+            background: var(--color-mint);
+        }
+
+        .checkbox-card input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .checkbox-text {
+            font-size: 1rem;
+            color: var(--color-text);
+        }
+
+        .qualification-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding: 24px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* ===== COMPARISON SECTION ===== */
+        .comparison-section {
+            padding: 80px 24px;
+            background: var(--color-white);
+        }
+
+        .comparison-grid {
+            max-width: 1000px;
+            margin: 40px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .comparison-card {
+            padding: 40px 24px;
+            border-radius: 12px;
+            border: 3px solid;
+            opacity: 0;
+            animation: slideInUp 0.8s ease forwards;
+        }
+
+        .comparison-card:nth-child(1) { animation-delay: 0.2s; }
+        .comparison-card:nth-child(2) { animation-delay: 0.4s; }
+
+        .comparison-card.bad {
+            border-color: #ffcdd2;
+            background: rgba(255, 205, 210, 0.1);
+        }
+
+        .comparison-card.good {
+            border-color: var(--color-primary);
+            background: var(--color-mint);
+        }
+
+        .comparison-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: var(--color-text);
+        }
+
+        .comparison-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 0.95rem;
+        }
+
+        .comparison-item span {
+            font-size: 1.5rem;
+        }
+
+        /* ===== NO TECH FEAR SECTION ===== */
+        .no-tech-section {
+            padding: 80px 24px;
+            background: var(--color-light-grey);
+        }
+
+        .no-tech-card {
+            max-width: 700px;
+            margin: 40px auto 0;
+            padding: 40px;
+            background: var(--color-mint);
+            border: 3px solid var(--color-primary);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .no-tech-card h3 {
+            font-size: 1.6rem;
+            color: var(--color-dark-green);
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+
+        .no-tech-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .no-tech-point {
+            padding: 16px;
+            background: var(--color-white);
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--color-dark-green);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .no-tech-point:nth-child(1) { animation-delay: 0.1s; }
+        .no-tech-point:nth-child(2) { animation-delay: 0.2s; }
+        .no-tech-point:nth-child(3) { animation-delay: 0.3s; }
+        .no-tech-point:nth-child(4) { animation-delay: 0.4s; }
+
+        /* ===== FOUNDER STORY SECTION ===== */
+        .founder-section {
+            padding: 80px 24px;
+            background: var(--color-white);
+            text-align: center;
+        }
+
+        .founder-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px;
+            border-left: 6px solid var(--color-primary);
+            text-align: left;
+            background: var(--color-light-grey);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--color-text);
+        }
+
+        /* ===== FINAL CTA SECTION ===== */
+        .final-cta-section {
+            padding: 80px 24px;
+            background: var(--color-light-grey);
+            text-align: center;
+        }
+
+        .final-cta-card {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 50px 40px;
+            background: var(--color-white);
+            border: 4px solid var(--color-primary);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(76, 175, 80, 0.15);
+        }
+
+        .final-cta-card h2 {
+            font-size: 1.8rem;
+            color: var(--color-text);
+            margin-bottom: 20px;
+        }
+
+        .final-cta-card p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .final-cta-button {
+            padding: 16px 40px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 300ms ease;
+            width: 100%;
+            animation: pulse-button 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-button {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .final-cta-button:hover {
+            background: var(--color-dark-green);
+            box-shadow: 0 15px 40px rgba(76, 175, 80, 0.3);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 40px 24px;
+            background: var(--color-text);
+            color: var(--color-white);
+            text-align: center;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky-cta {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .final-cta-card {
+                padding: 30px 20px;
+            }
+        }
+
+        /* ===== SCROLL ANIMATION TRIGGER ===== */
+        .fade-in-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="logo">WhatsApp API</div>
+            <div class="nav-buttons">
+                <a href="https://wa.me/919876543210?text=नमस्कार!%20मला%20WhatsApp%20API%20automation%20बद्दल%20अधिक%20माहिती%20हवी%20आहे.%20कृपया%20मला%20कॉल%20किंवा%20डेमो%20साठी%20स्लॉट%20सांगा." target="_blank" class="btn-header-wa">Quick Check</a>
+                <a href="https://wa.me/919876543210?text=नमस्कार!%20मला%20WhatsApp%20API%20automation%20बद्दल%20अधिक%20माहिती%20हवी%20आहे.%20कृपया%20मला%20कॉल%20किंवा%20डेमो%20साठी%20स्लॉट%20सांगा." target="_blank" class="btn-header-wa">Book Call</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- STICKY CTA -->
+    <a href="https://wa.me/919876543210?text=नमस्कार!%20मला%20WhatsApp%20API%20automation%20बद्दल%20अधिक%20माहिती%20हवी%20आहे.%20कृपया%20मला%20कॉल%20किंवा%20डेमो%20साठी%20स्लॉट%20सांगा." target="_blank" class="sticky-cta" style="text-decoration: none;">BOOK MY CALL</a>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>असे व्यवसायिक ज्यांना रोज WhatsApp वर enquiries येतात…</h1>
+            <p>पण reply उशिरा होतो, follow-up राहून जातो आणि sales हातातून निसटतात।</p>
+            <p style="margin-top: 30px; font-weight: 600; color: var(--color-primary);">
+                Team वाढवायची नाही। Manual chatting मध्ये अडकायचं नाही। WhatsApp ban ची भीती नको।<br>
+                <span style="font-size: 1.3rem;">तरीही जास्त customers + जास्त sales हवेत।</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- PROBLEM CARDS SECTION -->
+    <section class="problems-section">
+        <h2 class="section-title">समस्या कुणाला आहेत?</h2>
+        <div class="problems-grid">
+            <div class="problem-card">
+                <h3>⏱️</h3>
+                <h3>Reply उशिरा होतो</h3>
+                <p>Customer message पाठवतो, तुम्ही 2-3 तास उशिरा reply देतो।</p>
+            </div>
+            <div class="problem-card">
+                <h3>📝</h3>
+                <h3>Follow-up miss होतो</h3>
+                <p>2-3 दिन follow-up नाही तर lead ठंडा होऊन जातो।</p>
+            </div>
+            <div class="problem-card">
+                <h3>👥</h3>
+                <h3>Manual chatting waste</h3>
+                <p>Team member सतत messages reply करणे ही काम नाही, ही waste आहे।</p>
+            </div>
+            <div class="problem-card">
+                <h3>⚠️</h3>
+                <h3>WhatsApp ban fear</h3>
+                <p>Broadcast, unsolicited messages = Ban risk. असुरक्षित.</p>
+            </div>
+            <div class="problem-card">
+                <h3>💰</h3>
+                <h3>Sales leak होत आहेत</h3>
+                <p>सर्व problems मिळून 30-40% sales हातातून निसटतात.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOLUTION SECTION -->
+    <section class="solution-section">
+        <h2 class="section-title">तर Solution?</h2>
+        <div class="solution-content">
+            <p style="font-size: 1.2rem; margin-bottom: 40px;">एकाच system मधून सर्वकाही automate करा:</p>
+            <div class="system-diagram">
+                <div class="system-node">🤖 Auto Reply</div>
+                <div style="color: var(--color-primary); font-size: 1.5rem;">→</div>
+                <div class="system-node">🔄 Auto Follow-Up</div>
+                <div style="color: var(--color-primary); font-size: 1.5rem;">→</div>
+                <div class="system-node">📢 Bulk Message 1000/Day</div>
+            </div>
+            <p style="margin-top: 40px; font-size: 1.1rem; color: #666;">
+                👉 Reply automate करा (seconds मध्ये)<br>
+                👉 Follow-up automate करा (auto schedule)<br>
+                👉 एकाच क्लिकमध्ये 1000 लोकांपर्यंत message पाठवा (Meta-approved templates)
+            </p>
+        </div>
+    </section>
+
+    <!-- BENEFITS SECTION -->
+    <section class="benefits-section">
+        <h2 class="section-title">तुम्हाला काय मिळेल?</h2>
+        <div class="benefits-list">
+            <div class="benefit-item">
+                <div class="benefit-check">✓</div>
+                <div class="benefit-text">Instant reply (24/7)</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-check">✓</div>
+                <div class="benefit-text">Follow-up miss नाही</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-check">✓</div>
+                <div class="benefit-text">Offers, reminders एका क्लिकमध्ये</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-check">✓</div>
+                <div class="benefit-text">Team न वाढवता 5x scale करा</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIDEO SECTION -->
+    <section class="video-section">
+        <h2 class="section-title">Demo पहा</h2>
+        <p style="color: #666;">खऱ्या businesses WhatsApp automation कसं वापरतात ते 1 मिनिटमध्ये समजून घ्या।</p>
+        <div class="video-frame">
+            <a href="https://wa.me/919876543210?text=नमस्कार!%20मला%20WhatsApp%20API%20demo%20बद्दल%20अधिक%20माहिती%20हवी%20आहे.%20कृपया%20डेमो%20दाखवा." target="_blank" class="play-button" style="text-decoration: none;"></a>
+            <img src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/96601198-aad7-42c4-8370-08bf11891a80.png" alt="WhatsApp API Demo" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+    </section>
+
+    <!-- QUALIFICATION SECTION -->
+    <section class="qualification-section" id="qualification">
+        <h2 class="section-title">हा कॉल तुमच्यासाठी आहे?</h2>
+        <p style="text-align: center; margin-bottom: 30px; font-size: 1.05rem;">
+            <strong>सर्वांसाठी नाही. पण तुमच्यासाठी आहे का?</strong>
+        </p>
+        <div class="qualification-content">
+            <div class="checkbox-card">
+                <input type="checkbox" id="check1">
+                <label for="check1" class="checkbox-text" style="margin: 0; cursor: pointer;">Reply late होतो</label>
+            </div>
+            <div class="checkbox-card">
+                <input type="checkbox" id="check2">
+                <label for="check2" class="checkbox-text" style="margin: 0; cursor: pointer;">Manual follow-up शक्य होत नाही</label>
+            </div>
+            <div class="checkbox-card">
+                <input type="checkbox" id="check3">
+                <label for="check3" class="checkbox-text" style="margin: 0; cursor: pointer;">500–1000 customers ला message पाठवायचा आहे</label>
+            </div>
+            <div class="checkbox-card">
+                <input type="checkbox" id="check4">
+                <label for="check4" class="checkbox-text" style="margin: 0; cursor: pointer;">WhatsApp ban नको</label>
+            </div>
+            <div class="checkbox-card">
+                <input type="checkbox" id="check5">
+                <label for="check5" class="checkbox-text" style="margin: 0; cursor: pointer;">Team न वाढवता sales वाढवायच्या आहेत</label>
+            </div>
+            <div class="qualification-footer">
+                एकही YES असेल — ही call तुमच्यासाठीच आहे। ⬇️ Book करा.
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPARISON SECTION -->
+    <section class="comparison-section">
+        <h2 class="section-title">Normal WhatsApp vs. WhatsApp API</h2>
+        <div class="comparison-grid">
+            <div class="comparison-card bad">
+                <h3>❌ Normal WhatsApp</h3>
+                <div class="comparison-item"><span>❌</span> Broadcast limit 256 users</div>
+                <div class="comparison-item"><span>❌</span> Ban risk (unsolicited)</div>
+                <div class="comparison-item"><span>❌</span> No tracking/analytics</div>
+                <div class="comparison-item"><span>❌</span> Manual only</div>
+                <div class="comparison-item"><span>❌</span> Scale करू शकत नाही</div>
+            </div>
+            <div class="comparison-card good">
+                <h3>✅ WhatsApp API</h3>
+                <div class="comparison-item"><span>✅</span> 1000+ opted-in users/day</div>
+                <div class="comparison-item"><span>✅</span> Meta-approved, safe</div>
+                <div class="comparison-item"><span>✅</span> Real-time tracking</div>
+                <div class="comparison-item"><span>✅</span> Full automation</div>
+                <div class="comparison-item"><span>✅</span> 5-10x scale करा</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NO TECH FEAR SECTION -->
+    <section class="no-tech-section">
+        <h2 class="section-title">मला Technical काहीच येत नाही…</h2>
+        <div class="no-tech-card">
+            <h3>"मग कसे होणार?"</h3>
+            <p style="margin: 0; margin-bottom: 30px; color: var(--color-dark-green); font-size: 1.05rem;">
+                काही problem नाही. आमच्या साथ:
+            </p>
+            <div class="no-tech-points">
+                <div class="no-tech-point">🚫 Coding लागत नाही</div>
+                <div class="no-tech-point">🧠 Tech knowledge लागत नाही</div>
+                <div class="no-tech-point">👨‍💻 Developer लागत नाही</div>
+                <div class="no-tech-point">⚙️ हम setup करून देतो</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOUNDER STORY SECTION -->
+    <section class="founder-section">
+        <h2 class="section-title">माझी कहाणी</h2>
+        <div class="founder-content">
+            <strong style="font-size: 1.2rem; color: var(--color-primary);">नमस्कार! मी किरण हजारे.</strong>
+            <p>Problem leads चा नसतो. Problem system चा असतो.</p>
+            <p style="margin: 20px 0;">
+                मी 4 वर्षे sales मध्ये काम केले. हजारो leads आले, पण reply late असेल, follow-up miss असेल तर 30% sales हातातून निसटते.
+            </p>
+            <p>
+                आज मी WhatsApp API वापरून replies, follow-ups आणि bulk messaging automate करतो. Same team, 5x sales.
+            </p>
+            <p style="margin-top: 20px; color: var(--color-primary); font-weight: 600;">
+                तर मी तुम्हाला सांगत आहे — तुम्हালाही ही system काम करेल.
+            </p>
+        </div>
+    </section>
+
+    <!-- FINAL CTA SECTION -->
+    <section class="final-cta-section">
+        <div class="final-cta-card">
+            <h2>Daily Limited Call Slots</h2>
+            <p>Slots full झाले की booking बंद.</p>
+            <a href="https://wa.me/919876543210?text=नमस्कार!%20मला%20WhatsApp%20API%20automation%20बद्दल%20अधिक%20माहिती%20हवी%20आहे.%20कृपया%20मला%20कॉल%20किंवा%20डेमो%20साठी%20स्लॉट%20सांगा." target="_blank" class="final-cta-button" style="text-decoration: none; display: block;">
+                BOOK MY WHATSAPP API STRATEGY CALL
+            </a>
+            <p style="margin-top: 20px; font-size: 0.9rem; color: #999;">
+                30 मिनिटचा free strategy call. No sales pitch.
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>
+            WhatsApp™ is a trademark of Meta Platforms, Inc.<br>
+            Bulk messaging only for opted-in users using approved templates.<br>
+            Results depend on business model. No guarantees.
+        </p>
+    </footer>
+
+    <script>
+        // WhatsApp redirect configuration
+        const waPhoneNumber = '919876543210'; // Replace with your number (country code + number, no +)
+        
+        const waMessages = {
+            bookCall: 'नमस्कार! मला WhatsApp API automation बद्दल अधिक माहिती हवी आहे. कृपया मला कॉल किंवा डेमो साठी स्लॉट सांगा.',
+            demo: 'नमस्कार! मला WhatsApp API demo बद्दल अधिक माहिती हवी आहे. कृपया डेमो दाखवा.'
+        };
+
+        // Encode message for URL
+        function encodeWAMessage(message) {
+            return encodeURIComponent(message);
+        }
+
+        // Generate WhatsApp link
+        function generateWALink(message) {
+            return `https://wa.me/${waPhoneNumber}?text=${encodeWAMessage(message)}`;
+        }
+
+        // Smooth scroll to section
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
